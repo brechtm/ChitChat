@@ -11,7 +11,7 @@ NSString *const _AppleActionOnDoubleClickKey = @"AppleActionOnDoubleClick";
 NSString *const _AppleActionOnDoubleClickNotification = @"AppleNoRedisplayAppearancePreferenceChanged";
 NSString* const WAMShouldHideStatusItem = @"WAMShouldHideStatusItem";
 
-@interface AppDelegate () <NSWindowDelegate, WKNavigationDelegate, WKUIDelegate, NSUserNotificationCenterDelegate>
+@interface AppDelegate () <NSWindowDelegate, WKNavigationDelegate, WKUIDelegate, NSUserNotificationCenterDelegate, WKScriptMessageHandler>
 @property (strong, nonatomic) NSWindow *window;
 @property (strong, nonatomic) WKWebView *webView;
 @property (strong, nonatomic) NSStatusItem *statusItem;
@@ -36,6 +36,13 @@ NSString* const WAMShouldHideStatusItem = @"WAMShouldHideStatusItem";
     WKUserScript *emojiScript = [[WKUserScript alloc] initWithSource:emojiJS
                                                        injectionTime:WKUserScriptInjectionTimeAtDocumentEnd
                                                     forMainFrameOnly:NO];
+
+    // download js into webview
+    NSURL *pathToDownload = [[NSBundle mainBundle] URLForResource:@"download" withExtension:@"js"];
+    NSString *downloadJS = [NSString stringWithContentsOfURL:pathToDownload encoding:NSUTF8StringEncoding error:nil];
+    WKUserScript *downloadScript = [[WKUserScript alloc] initWithSource:downloadJS
+                                                          injectionTime:WKUserScriptInjectionTimeAtDocumentEnd
+                                                       forMainFrameOnly:NO];
     
     // inject js into webview
     NSURL *pathToJS = [[NSBundle mainBundle] URLForResource:@"inject" withExtension:@"js"];
@@ -49,9 +56,11 @@ NSString* const WAMShouldHideStatusItem = @"WAMShouldHideStatusItem";
                                                             injectionTime:WKUserScriptInjectionTimeAtDocumentEnd forMainFrameOnly:NO];
     [contentController addUserScript:jqueryUserScript];
     [contentController addUserScript:emojiScript];
+    [contentController addUserScript:downloadScript];
     [contentController addUserScript:userScript];
-    
+
     [contentController addScriptMessageHandler:[[WKScriptMessageHandlerToNotification alloc] initWithWindow:_window] name:@"notification"];
+    [contentController addScriptMessageHandler:self name:@"download"];
     config.userContentController = contentController;
 
 #if DEBUG
@@ -67,6 +76,17 @@ NSString* const WAMShouldHideStatusItem = @"WAMShouldHideStatusItem";
     [contentController addUserScript:noRightClickJS];
 #endif
     return config;
+}
+
+// http://www.joshuakehn.com/2014/10/29/using-javascript-with-wkwebview-in-ios-8.html
+- (void)userContentController:(WKUserContentController *)userContentController
+      didReceiveScriptMessage:(WKScriptMessage *)message {
+
+    if ([message.name isEqualToString:@"download"]) {
+        NSData *fileContents = [[NSData alloc]initWithBase64EncodedString:message.body options:NSDataBase64DecodingIgnoreUnknownCharacters];
+        NSString *filePath = [NSString stringWithFormat:@"/tmp/blob"];
+        [fileContents writeToFile:filePath atomically:YES];
+    }
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
@@ -309,14 +329,11 @@ NSString* const WAMShouldHideStatusItem = @"WAMShouldHideStatusItem";
 
     if ([url.host hasSuffix:@"whatsapp.com"] || [url.scheme isEqualToString:@"file"]) {
         decisionHandler(WKNavigationActionPolicyAllow);
-    } else if ([url.host hasSuffix:@"whatsapp.net"]) {
+    } else if ([url.absoluteString hasPrefix:@"blob:"]) {
         decisionHandler(WKNavigationActionPolicyCancel);
-
-        NSAlert *downloadMediaAlert = [[NSAlert alloc] init];
-        downloadMediaAlert.messageText = @"Downloading Media";
-        downloadMediaAlert.informativeText = @"To download media, please just drag and drop it from this window into Finder.";
-        [downloadMediaAlert addButtonWithTitle:@"OK"];
-        [downloadMediaAlert runModal];
+        // https://stackoverflow.com/questions/45065085/how-to-read-a-blob-data-url-in-wkwebview
+        NSString *downloadBlob = [NSString stringWithFormat:@"downloadBlob('%@');", url.absoluteString];
+        [self.webView evaluateJavaScript: downloadBlob completionHandler:nil];
     } else if ([url.absoluteString isEqualToString:@"about:blank"]) {
         decisionHandler(WKNavigationActionPolicyAllow);
     } else {

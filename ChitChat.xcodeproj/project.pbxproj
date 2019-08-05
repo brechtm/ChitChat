@@ -21,6 +21,7 @@
 		22D3AC7D1B0D57A3005FCA4B /* Sparkle.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = 22D3AC7A1B0D574D005FCA4B /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		22D3AC7F1B0D58C3005FCA4B /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = 22D3AC7E1B0D58C3005FCA4B /* dsa_pub.pem */; };
 		22FD6F861B18DE3A001B593D /* jquery.js in Resources */ = {isa = PBXBuildFile; fileRef = 22FD6F851B18DE3A001B593D /* jquery.js */; };
+		67768A2D22F6302400D91998 /* download.js in Resources */ = {isa = PBXBuildFile; fileRef = 67768A2C22F6302400D91998 /* download.js */; };
 		96A193451C87213B005E9536 /* emoji.js in Resources */ = {isa = PBXBuildFile; fileRef = 96A193441C87213B005E9536 /* emoji.js */; };
 /* End PBXBuildFile section */
 
@@ -57,6 +58,7 @@
 		22D3AC7A1B0D574D005FCA4B /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Sparkle.framework; sourceTree = "<group>"; };
 		22D3AC7E1B0D58C3005FCA4B /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = dsa_pub.pem; sourceTree = "<group>"; };
 		22FD6F851B18DE3A001B593D /* jquery.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = jquery.js; sourceTree = "<group>"; };
+		67768A2C22F6302400D91998 /* download.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = download.js; sourceTree = "<group>"; };
 		96A193441C87213B005E9536 /* emoji.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = emoji.js; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -108,6 +110,7 @@
 				1C152F56EDCA973A1C468608 /* WAMApplication.swift */,
 				1C152D41F9D97D5FD31F2236 /* WAMWebView.swift */,
 				1C15279010CB8562CAD66091 /* WKScriptMessageHandlerToNotification.swift */,
+				67768A2C22F6302400D91998 /* download.js */,
 			);
 			path = ChitChat;
 			sourceTree = "<group>";
@@ -197,6 +200,7 @@
 				2262F0DE1B0A9BD900186F1D /* inject.js in Resources */,
 				96A193451C87213B005E9536 /* emoji.js in Resources */,
 				22FD6F861B18DE3A001B593D /* jquery.js in Resources */,
+				67768A2D22F6302400D91998 /* download.js in Resources */,
 				226C98E61B0F564100515A14 /* noConnection.html in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
